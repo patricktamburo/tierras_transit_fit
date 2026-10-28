@@ -5,9 +5,11 @@ from pathlib import Path
 
 import yaml
 
-PARAM_NAMES = ["t0", "per", "rp", "a", "inc", "m", "b"]
+REQUIRED_PARAMS = ["t0", "per", "rp", "a", "inc", "m", "b"]
+LD_PARAMS = ["u1", "u2"]                      # optional
+PARAM_NAMES = REQUIRED_PARAMS + LD_PARAMS
 PARAM_LABELS = {"t0": "t0", "per": "per", "rp": "rp/rs", "a": "a/rs",
-                "inc": "inc", "m": "m", "b": "b"}
+                "inc": "inc", "m": "m", "b": "b", "u1": "u1", "u2": "u2"}
 
 DEFAULT_LC_COLUMNS = {
     "time": "BJD TDB", "flux": "Flux", "flux_err": "Flux Error",
@@ -87,19 +89,23 @@ def validate(cfg):
     pcfg = cfg.get("parameters")
     if not isinstance(pcfg, dict):
         raise ConfigError("'parameters' section is required.")
-    missing = [p for p in PARAM_NAMES if p not in pcfg]
+    missing = [p for p in REQUIRED_PARAMS if p not in pcfg]
     unknown = [p for p in pcfg if p not in PARAM_NAMES]
     if missing:
         raise ConfigError(f"Missing parameters: {missing}")
     if unknown:
         raise ConfigError(f"Unknown parameters: {unknown} (allowed: {PARAM_NAMES})")
+    if any(p in pcfg for p in LD_PARAMS) and cfg["model"]["limb_dark"] != "quadratic":
+        raise ConfigError("u1/u2 can only be fit with model.limb_dark: quadratic.")
 
     n_free = 0
     for name in PARAM_NAMES:
+        if name not in pcfg:
+            continue
         s = pcfg[name]
         if "fixed" in s:
             continue
-        n_free += 1
+        n_free += 1 
         kind = s.get("prior")
         if kind == "gaussian":
             if "mu" not in s or "sigma" not in s or s["sigma"] <= 0:

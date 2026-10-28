@@ -4,7 +4,6 @@ import numpy as np
 
 from .config import PARAM_LABELS, PARAM_NAMES
 
-
 class tierras_transit_fit:
     """Holds the data, batman model, priors, and probability functions."""
 
@@ -15,9 +14,11 @@ class tierras_transit_fit:
         self.x_offset = x_offset
         self.x_ref = self.x[0]  # baseline: m*(x - x_ref) + b
 
-        self.specs = {n: cfg["parameters"][n] for n in PARAM_NAMES}
+        self.names = [n for n in PARAM_NAMES if n in cfg["parameters"]]
+        self.specs = {n: cfg["parameters"][n] for n in self.names}
         self.fixed = {n: float(s["fixed"]) for n, s in self.specs.items() if "fixed" in s}
-        self.free = [n for n in PARAM_NAMES if n not in self.fixed]
+        self.free = [n for n in self.names if n not in self.fixed]
+        self._u0 = list(cfg["model"]["u"])   # fallback for any of u1/u2 not in `parameters` 
 
         mcfg = cfg["model"]
         self.params = batman.TransitParams()
@@ -85,12 +86,22 @@ class tierras_transit_fit:
         self.params.rp = p["rp"]
         self.params.a = p["a"]
         self.params.inc = p["inc"]
+        if "u1" in p or "u2" in p:
+            self.params.u = [p.get("u1", self._u0[0]), p.get("u2", self._u0[1])]
+
         transit = self._bm.light_curve(self.params)
         return transit * (p["m"] * (self.x - self.x_ref) + p["b"])
 
     # -- probabilities ---------------------------------------------------
     def log_prior(self, theta):
         p = self.full_params(theta)
+        
+        if "u1" in p or "u2" in p:
+            u1, u2 = p.get("u1", self._u0[0]), p.get("u2", self._u0[1])
+            # Kipping (2013): keeps the quadratic profile positive and monotonic
+            if not (u1 > 0 and u1 + u2 < 1 and u1 + 2 * u2 > 0):
+                return -np.inf
+
         if p["per"] <= 0 or p["rp"] <= 0 or p["a"] <= 1 or not (0 <= p["inc"] <= 90):
             return -np.inf
         lp = 0.0
