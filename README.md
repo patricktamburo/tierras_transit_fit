@@ -8,6 +8,12 @@ Config-driven single-night transit fitting (batman + emcee) for Tierras light cu
 pip install git+https://github.com/patricktamburo/tierras_transit_fit.git
 ```
 
+or upgrade:
+
+```bash
+pip install git+https://github.com/patricktamburo/tierras_transit_fit.git --upgrade
+```
+
 ## Use
 
 ```bash
