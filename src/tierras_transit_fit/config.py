@@ -29,7 +29,7 @@ DEFAULTS = {
     "selection": {"alc_min": 0.5, "sigma_clip": {"low": 4.0, "high": 4.0}},
     "model": {"ecc": 0.0, "w": 90.0, "limb_dark": "quadratic", "u": [0.1, 0.3]},
     "mcmc": {"nwalkers": 32, "nsteps": 2000, "burn_frac": 0.1, "seed": None},
-    "plot": {"points_per_bin": 64, "ylim": None, "dpi": 300},
+    "plot": {"points_per_bin": 64, "ylim": None, "dpi": 300, "data_figsize":(8,10)},
 }
 
 

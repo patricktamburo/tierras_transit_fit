@@ -4,14 +4,16 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 from corner import corner
+from ast import literal_eval
 
 from .data import bin_data
 
 log = logging.getLogger(__name__)
 
 
-def plot_data(data, fit, x_offset, ppb, ylim=None, samples=None, theta_init=None):
-    fig, ax = plt.subplots(5, 1, figsize=(10, 10), sharex=True,
+def plot_data(data, fit, x_offset, ppb, data_figsize, ylim=None, samples=None, theta_init=None):
+    data_figsize = literal_eval(data_figsize)
+    fig, ax = plt.subplots(5, 1, figsize=data_figsize, sharex=True,
                            gridspec_kw={"height_ratios": [2, 1, 1, 1, 1]})
     x = data["x"]
     unique_exp = np.unique(data["exptime"])

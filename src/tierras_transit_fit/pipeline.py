@@ -52,13 +52,14 @@ def run(config, *, plot_init=False, nsteps=None, progress=True, show=False):
     ppb = cfg["plot"]["points_per_bin"]
     dpi = cfg["plot"]["dpi"]
     ylim = cfg["plot"]["ylim"]
+    data_figsize = cfg["plot"]["data_figsize"]
 
     data = load_data(cfg)
     data, x_offset = prepare_data(data, cfg["selection"])
     fit = tierras_transit_fit(cfg, data, x_offset)
 
     if plot_init:
-        fig = plot_data(data, fit, x_offset, ppb, ylim, theta_init=fit.initial_guess())
+        fig = plot_data(data, fit, x_offset, ppb, data_figsize, ylim, theta_init=fit.initial_guess())
         if show:
             plt.show()
         return FitResult(fit=fit, data=data, x_offset=x_offset, figures={"data": fig})
@@ -86,7 +87,7 @@ def run(config, *, plot_init=False, nsteps=None, progress=True, show=False):
     shutil.copy(cfg["_config_path"], outdir / f"{prefix}_config.yaml")  # provenance
 
     figures = {
-        "data": plot_data(data, fit, x_offset, ppb, ylim, samples=flat),
+        "data": plot_data(data, fit, x_offset, ppb, data_figsize, ylim, samples=flat),
         "chains": plot_chains(sampler, fit.labels, nburn),
         "corner": plot_corner(flat, fit.labels, fit.truths()),
     }
