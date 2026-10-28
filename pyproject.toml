@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tierras_transit_fit"
+version = "0.1.0"
+description = "Config-driven single-transit fitting with batman + emcee"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "matplotlib",
+    "batman-package",
+    "emcee>=3.0",
+    "corner",
+    "pyyaml",
+    "tqdm",            # emcee progress bar
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "build"]
+
+[project.scripts]
+tierras_transit_fit = "tierras_transit_fit.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+tierras_transit_fit = ["templates/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

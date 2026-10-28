@@ -1,0 +1,56 @@
+# ---------- identification / output ----------
+target: V1298Tau
+planet: b
+label: "20261025"            # e.g. observation date; used in output filenames
+
+output:
+  directory: results         # created if needed (relative to this config file)
+  # prefix: custom_name      # optional; default = <target><planet>_<label>
+  save_plots: true
+
+# ---------- data (paths are relative to this config file) ----------
+data:
+  lightcurve: V1298Tau_global_lc.csv
+  ancillary: global_ancillary_data.csv  
+
+# ---------- data selection ----------
+selection:
+  time_window: [2461339.5, 2461340.5]   # EDIT: absolute BJD TDB range containing the transit night
+  alc_min: 0.5                          # reject points with normalized ALC flux below this
+  sigma_clip: {low: 4.0, high: 4.0}     # set to null to disable
+
+# ---------- transit model (things that are NOT fit) ----------
+model:
+  ecc: 0.0
+  w: 90.0
+  limb_dark: quadratic
+  u: [0.1, 0.3]
+
+# ---------- fit parameters ----------
+# All 7 must be listed. Each is one of:
+#   {prior: gaussian, mu, sigma}                  also used to initialize walkers
+#   {prior: uniform, min, max, init: [mean, std]}
+#   {fixed: <value>}                              not fit
+# 'init: [mean, std]' can be added to a gaussian prior to override walker initialization.
+# m and b describe the baseline:  flux_baseline = m*(t - t[0]) + b
+parameters:
+  t0:  {prior: gaussian, mu: 2458298.209601, sigma: 0.000585}
+  per: {prior: gaussian, mu: 24.140006,      sigma: 0.000017}
+  rp:  {prior: gaussian, mu: 0.0661,         sigma: 0.0019}
+  a:   {prior: gaussian, mu: 26.06,          sigma: 0.46}
+  inc: {prior: gaussian, mu: 88.759,         sigma: 0.077}
+  m:   {prior: uniform, min: -1.0, max: 1.0, init: [0.015, 0.002]}
+  b:   {prior: uniform, min: 0.5,  max: 1.5, init: [1.0, 0.005]}
+
+# ---------- MCMC ----------
+mcmc:
+  nwalkers: 32
+  nsteps: 4000
+  burn_frac: 0.1
+  seed: 42
+
+# ---------- plotting ----------
+plot:
+  points_per_bin: 64
+  # ylim: [0.985, 1.015]    # default: automatic
+  dpi: 300
