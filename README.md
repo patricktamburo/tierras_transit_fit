@@ -5,9 +5,7 @@ Config-driven single-night transit fitting (batman + emcee) for Tierras light cu
 ## Install
 
 ```bash
-python -m venv .venv && source .venv/bin/activate   # recommended
-pip install .            # regular install
-pip install -e ".[dev]"  # editable + test tools (for development)
+pip install git+https://github.com/patricktamburo/tierras_transit_fit.git
 ```
 
 ## Use

@@ -24,7 +24,7 @@ model:
   limb_dark: quadratic
 
 # ---------- fit parameters ----------
-# All 7 must be listed. Each is one of:
+# Each is one of:
 #   {prior: gaussian, mu, sigma}                  also used to initialize walkers
 #   {prior: uniform, min, max, init: [mean, std]}
 #   {fixed: <value>}                              not fit
