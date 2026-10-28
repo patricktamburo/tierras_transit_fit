@@ -52,7 +52,7 @@ def load_data(cfg):
     }
 
 
-def prepare_data(data, sel):
+def prepare_data(data, sel, dat):
     """Normalize, cut to the transit night, apply quality cuts and sigma clip.
 
     Returns (data, x_offset); times in the returned data have x_offset subtracted.
@@ -74,10 +74,13 @@ def prepare_data(data, sel):
     data["y_err"] = data["y_err"] / norm2
 
     # quality mask
-    bad = (data["wcs_flag"] | data["pos_flag"] | data["fwhm_flag"]
-           | (data["alc"] < sel["alc_min"])
-           | ~np.isfinite(data["y"]) | ~np.isfinite(data["y_err"]))
-    data = mask_data(data, ~bad)
+    quality_mask = dat['quality_mask']
+
+    if quality_mask:
+        bad = (data["wcs_flag"] | data["pos_flag"] | data["fwhm_flag"]
+            | (data["alc"] < sel["alc_min"])
+            | ~np.isfinite(data["y"]) | ~np.isfinite(data["y_err"]))
+        data = mask_data(data, ~bad)
     if len(data["x"]) == 0:
         raise ValueError("All points removed by quality cuts.")
 

@@ -12,6 +12,7 @@ output:
 data:
   lightcurve: V1298Tau_global_lc.csv
   ancillary: global_ancillary_data.csv  
+  quality_mask: false
 
 # ---------- data selection ----------
 selection:

@@ -55,7 +55,7 @@ def run(config, *, plot_init=False, nsteps=None, progress=True, show=False):
     data_figsize = cfg["plot"]["data_figsize"]
 
     data = load_data(cfg)
-    data, x_offset = prepare_data(data, cfg["selection"])
+    data, x_offset = prepare_data(data, cfg["selection"], cfg['data'])
     fit = tierras_transit_fit(cfg, data, x_offset)
 
     if plot_init:
