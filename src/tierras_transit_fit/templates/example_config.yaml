@@ -21,10 +21,7 @@ selection:
 
 # ---------- transit model (things that are NOT fit) ----------
 model:
-  ecc: 0.0
-  w: 90.0
   limb_dark: quadratic
-  u: [0.1, 0.3]
 
 # ---------- fit parameters ----------
 # All 7 must be listed. Each is one of:
@@ -34,15 +31,17 @@ model:
 # 'init: [mean, std]' can be added to a gaussian prior to override walker initialization.
 # m and b describe the baseline:  flux_baseline = m*(t - t[0]) + b
 parameters:
-  t0:  {prior: gaussian, mu: 2458298.209601, sigma: 0.000585}
-  per: {prior: gaussian, mu: 24.140006,      sigma: 0.000017}
-  rp:  {prior: gaussian, mu: 0.0661,         sigma: 0.0019}
-  a:   {prior: gaussian, mu: 26.06,          sigma: 0.46}
-  inc: {prior: gaussian, mu: 88.759,         sigma: 0.077}
-  u1:  {prior: gaussian, mu: 0.1,            sigma: 0.05}
-  u2:  {prior: gaussian, mu: 0.3,            sigma: 0.05}
-  m:   {prior: uniform, min: -1.0, max: 1.0, init: [0.015, 0.002]}
-  b:   {prior: uniform, min: 0.5,  max: 1.5, init: [1.0, 0.005]}
+  t0:  {prior: gaussian, mu: 2458298.209601, sigma: 0.000585}        # mid-transit reference time
+  per: {prior: gaussian, mu: 24.140006,      sigma: 0.000017}        # period (days)
+  rp:  {prior: gaussian, mu: 0.0661,         sigma: 0.0019}          # Rp/Rs
+  a:   {prior: gaussian, mu: 26.06,          sigma: 0.46}            # a/rs
+  inc: {prior: gaussian, mu: 88.759,         sigma: 0.077}           # orbital inclination (deg)
+  ecc: {fixed: 0.0}                                                  # eccentricity
+  w:   {fixed: 0.0}                                                  # longitude of periastron (deg)
+  u1:  {prior: gaussian, mu: 0.1,            sigma: 0.05}            # quadratic limb darkening coefficient 1
+  u2:  {prior: gaussian, mu: 0.3,            sigma: 0.05}            # quadratic limb darkening coefficient 2
+  m:   {prior: uniform, min: -1.0, max: 1.0, init: [0.015, 0.002]}   # linear baseline slope 
+  b:   {prior: uniform, min: 0.5,  max: 1.5, init: [1.0, 0.005]}     # linear baseline offset
 
 # ---------- MCMC ----------
 mcmc:

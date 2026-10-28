@@ -19,6 +19,8 @@ class tierras_transit_fit:
         self.fixed = {n: float(s["fixed"]) for n, s in self.specs.items() if "fixed" in s}
         self.free = [n for n in self.names if n not in self.fixed]
         self._u0 = list(cfg["model"]["u"])   # fallback for any of u1/u2 not in `parameters` 
+        self._ecc0 = float(cfg["model"]["ecc"])   # fallbacks if not in `parameters`
+        self._w0 = float(cfg["model"]["w"])
 
         mcfg = cfg["model"]
         self.params = batman.TransitParams()
@@ -86,6 +88,8 @@ class tierras_transit_fit:
         self.params.rp = p["rp"]
         self.params.a = p["a"]
         self.params.inc = p["inc"]
+        self.params.ecc = p.get("ecc", self._ecc0)
+        self.params.w = p.get("w", self._w0)
         if "u1" in p or "u2" in p:
             self.params.u = [p.get("u1", self._u0[0]), p.get("u2", self._u0[1])]
 
@@ -95,7 +99,7 @@ class tierras_transit_fit:
     # -- probabilities ---------------------------------------------------
     def log_prior(self, theta):
         p = self.full_params(theta)
-        
+
         if "u1" in p or "u2" in p:
             u1, u2 = p.get("u1", self._u0[0]), p.get("u2", self._u0[1])
             # Kipping (2013): keeps the quadratic profile positive and monotonic
@@ -104,6 +108,11 @@ class tierras_transit_fit:
 
         if p["per"] <= 0 or p["rp"] <= 0 or p["a"] <= 1 or not (0 <= p["inc"] <= 90):
             return -np.inf
+        
+        ecc = p.get("ecc", self._ecc0)
+        if not (0 <= ecc < 1) or p["a"] * (1 - ecc) <= 1:   # bound orbit; periastron outside the star
+            return -np.inf
+        
         lp = 0.0
         for name, val in zip(self.free, theta):
             s = self.specs[name]

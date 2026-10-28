@@ -6,10 +6,13 @@ from pathlib import Path
 import yaml
 
 REQUIRED_PARAMS = ["t0", "per", "rp", "a", "inc", "m", "b"]
+ORBIT_PARAMS = ["ecc", "w"]                   # optional
 LD_PARAMS = ["u1", "u2"]                      # optional
-PARAM_NAMES = REQUIRED_PARAMS + LD_PARAMS
+PARAM_NAMES = REQUIRED_PARAMS + ORBIT_PARAMS + LD_PARAMS
 PARAM_LABELS = {"t0": "t0", "per": "per", "rp": "rp/rs", "a": "a/rs",
-                "inc": "inc", "m": "m", "b": "b", "u1": "u1", "u2": "u2"}
+                "inc": "inc", "m": "m", "b": "b",
+                "ecc": "ecc", "w": "w", "u1": "u1", "u2": "u2"}
+
 
 DEFAULT_LC_COLUMNS = {
     "time": "BJD TDB", "flux": "Flux", "flux_err": "Flux Error",
@@ -119,6 +122,12 @@ def validate(cfg):
             raise ConfigError(f"'{name}': set 'prior: gaussian|uniform' or 'fixed: <value>'.")
         if "init" in s and len(s["init"]) != 2:
             raise ConfigError(f"'{name}': init must be [mean, std].")
+        
+    ecc_vals = [cfg["model"]["ecc"]]
+    if "fixed" in pcfg.get("ecc", {}):
+        ecc_vals.append(pcfg["ecc"]["fixed"])
+    if any(not (0 <= e < 1) for e in ecc_vals):
+        raise ConfigError("eccentricity must satisfy 0 <= ecc < 1.")
 
     nw = cfg["mcmc"]["nwalkers"]
     if nw < 2 * n_free or nw % 2:
